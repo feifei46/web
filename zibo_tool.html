@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>淄博烧烤爆红诊断工具箱</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', 'PingFang SC', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* 主卡片 */
+        .main-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        /* 头部 */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* 内容区域 */
+        .content {
+            padding: 30px;
+        }
+        
+        /* 工具选择按钮 */
+        .tool-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .tool-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 14px 20px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #333;
+        }
+        
+        .tool-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .tool-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        
+        /* 输入区域 */
+        .input-section {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .input-section label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 13px;
+            resize: vertical;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        /* 按钮组 */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+        
+        /* 工具三的维度评分区域 */
+        .dimensions-section {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .dimension-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+        
+        .dimension-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dimension-name {
+            width: 100px;
+            font-weight: bold;
+        }
+        
+        .dimension-weight {
+            width: 80px;
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .dimension-desc {
+            flex: 1;
+            color: #888;
+            font-size: 12px;
+        }
+        
+        .dimension-score {
+            width: 120px;
+        }
+        
+        .dimension-score input {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .score-bar {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .bar-bg {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+        
+        .bar-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        
+        /* 结果区域 */
+        .result-section {
+            background: #1e1e2e;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+        
+        .result-section h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+        
+        .result-content {
+            background: #2d2d3a;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            color: #e0e0e0;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            justify-content: flex-end;
+        }
+        
+        /* 提示信息 */
+        .info-tip {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #1565c0;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            .tool-tabs {
+                flex-direction: column;
+            }
+            .dimension-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .dimension-score {
+                width: 100%;
+            }
+        }
+        
+        /* 进度条 */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="main-card">
+        <div class="header">
+            <h1>🍢 淄博烧烤爆红诊断工具箱</h1>
+            <p>基于情感分析与关键词提取的文旅目的地诊断工具</p>
+        </div>
+        
+        <div class="content">
+            <!-- 工具选择 -->
+            <div class="tool-tabs">
+                <button class="tool-btn active" data-tool="tool1">📊 工具一：情感预警表</button>
+                <button class="tool-btn" data-tool="tool2">🔑 工具二：关键词看板</button>
+                <button class="tool-btn" data-tool="tool3">🔥 工具三：热度指数卡</button>
+            </div>
+            
+            <!-- 工具一和工具二的输入区域 -->
+            <div id="commentInputArea" class="input-section">
+                <label>📝 评论数据输入</label>
+                <textarea id="commentInput" placeholder="请将评论粘贴到下方（每条评论占一行）：&#10;&#10;淄博烧烤太好吃啦，服务态度也很好！&#10;排队太久了，等了两个小时...&#10;价格实惠，味道正宗，下次还来！"></textarea>
+                <div class="button-group">
+                    <button id="importBtn" class="btn btn-secondary">📁 导入CSV</button>
+                    <button id="clearBtn" class="btn btn-secondary">🗑️ 清空</button>
+                    <button id="sampleBtn" class="btn btn-secondary">📋 加载示例</button>
+                </div>
+                <input type="file" id="csvFile" accept=".csv" style="display: none;">
+            </div>
+            
+            <!-- 工具三的维度评分区域（初始隐藏） -->
+            <div id="dimensionArea" class="dimensions-section" style="display: none;">
+                <label>📐 多维度评分（0-100分）</label>
+                <div id="dimensionsList"></div>
+            </div>
+            
+            <!-- 进度条 -->
+            <div id="progressBar" class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            
+            <!-- 结果区域 -->
+            <div class="result-section">
+                <h3>📈 分析结果</h3>
+                <div id="resultContent" class="result-content">
+                    请选择工具并输入数据，然后点击"开始分析"...
+                </div>
+                <div class="result-actions">
+                    <button id="copyBtn" class="btn btn-secondary">📋 复制结果</button>
+                    <button id="saveBtn" class="btn btn-secondary">💾 保存结果</button>
+                    <button id="runBtn" class="btn btn-primary">🚀 开始分析</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== 配置 ====================
+    // 停用词列表
+    const STOPWORDS = new Set([
+        '的', '了', '是', '在', '我', '有', '和', '就', '不', '人', '都', '一', '一个', '上', '也', '很', '到', '说', '要', '去', '你', '会', '着',
+        '没有', '看', '好', '自己', '这', '那', '有', '来', '啊', '哦', '嗯', '哈哈', '真的', '感觉', '觉得', '特别', '非常', '有点', '还是', '但是', '因为',
+        '所以', '然后', '可以', '我们', '你们', '他们', '这个', '那个', '什么', '怎么', '为什么', '哪里', '这里', '那里', '一下', '一点', '一样', '一直', '一定',
+        '可能', '应该', '已经', '出来', '起来', '过来', '回去', '进去', '上去', '下去', '出来', '起来', '过来', '回去', '进去', '上去', '下去', '今天', '明天',
+        '昨天', '现在', '以前', '以后', '当时', '之后', '之前', '最后', '第一', '第二', '第三', '一次', '两次', '三次', '的', '了', '是', '在', '和', '就', '都'
+    ]);
+    
+    // 维度配置
+    const DIMENSIONS = [
+        { name: "话题性", weight: 25, desc: "社交媒体讨论量、热搜次数" },
+        { name: "承接力", weight: 25, desc: "政府响应速度、基础设施配套" },
+        { name: "独特性", weight: 20, desc: "差异化体验、不可替代性" },
+        { name: "传播力", weight: 15, desc: "UGC内容数量、用户自发传播" },
+        { name: "持续力", weight: 15, desc: "复购率、口碑稳定性" }
+    ];
+    
+    // 当前选中的工具
+    let currentTool = "tool1";
+    
+    // 关键词监测列表
+    const MONITOR_KEYWORDS = ["排队", "贵", "涨价", "服务", "价格", "等待"];
+    
+    // ==================== 工具函数 ====================
+    
+    /**
+     * 清洗文本
+     */
+    function cleanText(text) {
+        if (!text) return "";
+        // 移除标点符号，保留中文、英文、数字
+        return text.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '').trim();
+    }
+    
+    /**
+     * 简单的情感分析（基于关键词）
+     * 由于浏览器无法运行 SnowNLP，使用基于正面/负面词库的简单分析
+     */
+    function analyzeSentiment(text) {
+        if (!text) return "中性";
+        
+        const positiveWords = ['好', '棒', '赞', '喜欢', '爱', '推荐', '好吃', '美味', '正宗', '满意', '实惠', '便宜', '值得', '热情', '贴心', '干净', '卫生', '方便', '快捷', '良心', '地道', '惊艳', '完美'];
+        const negativeWords = ['差', '烂', '贵', '坑', '失望', '难吃', '不好', '一般', '垃圾', '生气', '投诉', '排队慢', '等太久', '服务差', '态度差', '脏', '乱', '差评', '后悔', '不值', '宰客'];
+        
+        let positiveScore = 0;
+        let negativeScore = 0;
+        
+        for (const word of positiveWords) {
+            if (text.includes(word)) positiveScore++;
+        }
+        for (const word of negativeWords) {
+            if (text.includes(word)) negativeScore++;
+        }
+        
+        // 根据句子长度调整
+        const length = text.length;
+        const normScore = (positiveScore - negativeScore) / (Math.min(length, 100) / 20 + 1);
+        
+        if (normScore > 0.3) return "正面";
+        if (normScore < -0.2) return "负面";
+        return "中性";
+    }
+    
+    /**
+     * 分词（简单版本，基于正则）
+     */
+    function segment(text) {
+        // 简单的中文分词：匹配中文字符串
+        const matches = text.match(/[\u4e00-\u9fa5]+/g);
+        if (!matches) return [];
+        
+        const words = [];
+        for (const match of matches) {
+            // 按2-4个字符的窗口提取词
+            for (let i = 0; i < match.length; i++) {
+                for (let len = 2; len <= 4 && i + len <= match.length; len++) {
+                    const word = match.substring(i, i + len);
+                    if (word.length >= 2) {
+                        words.push(word);
+                    }
+                }
+            }
+            // 也添加单字词中可能有意义的
+            for (let i = 0; i < match.length; i++) {
+                const word = match[i];
+                if (word.length >= 1 && !STOPWORDS.has(word) && /[\u4e00-\u9fa5]/.test(word)) {
+                    words.push(word);
+                }
+            }
+        }
+        return words;
+    }
+    
+    /**
+     * 提取关键词
+     */
+    function extractKeywords(texts, topN = 20) {
+        const wordCount = new Map();
+        
+        for (const text of texts) {
+            if (!text) continue;
+            const words = segment(text);
+            for (const word of words) {
+                if (word.length < 2) continue;
+                if (STOPWORDS.has(word)) continue;
+                wordCount.set(word, (wordCount.get(word) || 0) + 1);
+            }
+        }
+        
+        const sorted = Array.from(wordCount.entries()).sort((a, b) => b[1] - a[1]);
+        return sorted.slice(0, topN);
+    }
+    
+    /**
+     * 获取评论列表
+     */
+    function getComments() {
+        const textarea = document.getElementById('commentInput');
+        const content = textarea.value.trim();
+        if (!content) return [];
+        
+        const lines = content.split('\n');
+        return lines.filter(line => line.trim() && !line.trim().startsWith('【'));
+    }
+    
+    // ==================== 工具一：情感预警表 ====================
+    function runTool1(comments) {
+        if (!comments.length) {
+            return "【错误】请先输入或导入评论数据";
+        }
+        
+        const sentiments = [];
+        for (const comment of comments) {
+            const cleaned = cleanText(comment);
+            const sent = analyzeSentiment(cleaned);
+            sentiments.push(sent);
+        }
+        
+        const total = sentiments.length;
+        const positive = sentiments.filter(s => s === "正面").length;
+        const neutral = sentiments.filter(s => s === "中性").length;
+        const negative = sentiments.filter(s => s === "负面").length;
+        const negativeRate = negative / total * 100;
+        
+        // 关键词监测
+        const keywordStats = {};
+        for (const kw of MONITOR_KEYWORDS) {
+            let count = 0;
+            for (const comment of comments) {
+                if (comment.includes(kw)) count++;
+            }
+            keywordStats[kw] = count;
+        }
+        
+        // 生成预警
+        let alert = "";
+        let alertLevel = "";
+        if (negativeRate > 50) {
+            alert = "🔴 红色预警：负面情绪占比超过50%，建议暂停投放，主动回应，排查问题";
+            alertLevel = "red";
+        } else if (negativeRate > 30) {
+            alert = "🟡 黄色预警：负面情绪占比超过30%，建议启动舆情监测，准备应对方案";
+            alertLevel = "yellow";
+        } else {
+            alert = "🟢 正常：负面情绪占比在安全范围内";
+            alertLevel = "green";
+        }
+        
+        // 生成结果
+        const lines = [];
+        lines.push("═".repeat(50));
+        lines.push("📊 工具一：情感预警表分析结果");
+        lines.push("═".repeat(50));
+        lines.push("");
+        lines.push("📈 评论统计：");
+        lines.push(`   总评论数：${total}`);
+        lines.push(`   正面评论：${positive} (${(positive/total*100).toFixed(1)}%)`);
+        lines.push(`   中性评论：${neutral} (${(neutral/total*100).toFixed(1)}%)`);
+        lines.push(`   负面评论：${negative} (${negativeRate.toFixed(1)}%)`);
+        lines.push("");
+        lines.push("⚠️ 预警信息：");
+        lines.push(`   ${alert}`);
+        lines.push("");
+        lines.push("📈 关键词监测：");
+        for (const [kw, count] of Object.entries(keywordStats)) {
+            lines.push(`   “${kw}” 出现次数：${count}`);
+            if (kw === "排队" && count > total * 0.3) {
+                lines.push(`      ⚠️ 提示：排队提及率高，建议评估承载能力，分流引导`);
+            }
+            if (kw === "贵" && count > total * 0.2) {
+                lines.push(`      ⚠️ 提示：价格提及率高，建议检查定价策略`);
+            }
+        }
+        
+        // 添加简单的可视化
+        lines.push("");
+        lines.push("📊 情感分布图：");
+        const posBar = "█".repeat(Math.round(positive / total * 30));
+        const neuBar = "█".repeat(Math.round(neutral / total * 30));
+        const negBar = "█".repeat(Math.round(negative / total * 30));
+        lines.push(`   正面 ${posBar} ${(positive/total*100).toFixed(1)}%`);
+        lines.push(`   中性 ${neuBar} ${(neutral/total*100).toFixed(1)}%`);
+        lines.push(`   负面 ${negBar} ${(negative/total*100).toFixed(1)}%`);
+        
+        return lines.join('\n');
+    }
+    
+    // ==================== 工具二：关键词看板 ====================
+    function runTool2(comments) {
+        if (!comments.length) {
+            return "【错误】请先输入或导入评论数据";
+        }
+        
+        const positiveComments = [];
+        const negativeComments = [];
+        const neutralComments = [];
+        
+        for (const comment of comments) {
+            const cleaned = cleanText(comment);
+            const sent = analyzeSentiment(cleaned);
+            if (sent === "正面") positiveComments.push(cleaned);
+            else if (sent === "负面") negativeComments.push(cleaned);
+            else neutralComments.push(cleaned);
+        }
+        
+        const posKeywords = extractKeywords(positiveComments, 20);
+        const negKeywords = extractKeywords(negativeComments, 20);
+        
+        const lines = [];
+        lines.push("═".repeat(50));
+        lines.push("🔑 工具二：关键词看板分析结果");
+        lines.push("═".repeat(50));
+        lines.push("");
+        lines.push("📊 评论分布：");
+        lines.push(`   正面评论：${positiveComments.length} 条`);
+        lines.push(`   中性评论：${neutralComments.length} 条`);
+        lines.push(`   负面评论：${negativeComments.length} 条`);
+        lines.push("");
+        lines.push("✅ 正面关键词 TOP20：");
+        if (posKeywords.length) {
+            for (let i = 0; i < Math.min(posKeywords.length, 20); i++) {
+                const [word, count] = posKeywords[i];
+                lines.push(`   ${i+1}. ${word}（词频：${count}）`);
+            }
+        } else {
+            lines.push("   暂无正面关键词");
+        }
+        lines.push("");
+        lines.push("❌ 负面关键词 TOP20：");
+        if (negKeywords.length) {
+            for (let i = 0; i < Math.min(negKeywords.length, 20); i++) {
+                const [word, count] = negKeywords[i];
+                lines.push(`   ${i+1}. ${word}（词频：${count}）`);
+            }
+        } else {
+            lines.push("   暂无负面关键词");
+        }
+        lines.push("");
+        lines.push("💡 传播建议：");
+        if (posKeywords.length) {
+            lines.push(`   • 强化“${posKeywords[0][0]}”这一核心卖点，加大传播力度`);
+        }
+        if (negKeywords.length) {
+            lines.push(`   • 关注“${negKeywords[0][0]}”这一高频负面槽点，优先整改`);
+        }
+        
+        // 词云可视化（文字）
+        if (posKeywords.length) {
+            lines.push("");
+            lines.push("📊 正面词云：");
+            const maxCount = posKeywords[0][1];
+            for (let i = 0; i < Math.min(posKeywords.length, 12); i++) {
+                const [word, count] = posKeywords[i];
+                const size = Math.max(1, Math.floor(count / maxCount * 3));
+                const bigWord = word.repeat(size);
+                lines.push(`   ${bigWord}  ${count}`);
+            }
+        }
+        
+        return lines.join('\n');
+    }
+    
+    // ==================== 工具三：热度指数卡 ====================
+    function runTool3() {
+        const scores = [];
+        let totalWeighted = 0;
+        let totalWeight = 0;
+        
+        for (const dim of DIMENSIONS) {
+            const input = document.getElementById(`score_${dim.name}`);
+            let score = parseFloat(input.value);
+            if (isNaN(score)) score = 50;
+            score = Math.max(0, Math.min(100, score));
+            
+            const weighted = score * dim.weight / 100;
+            totalWeighted += weighted;
+            totalWeight += dim.weight;
+            scores.push({ ...dim, score, weighted });
+        }
+        
+        const totalScore = totalWeight / 0 ? 0 : totalWeighted / (totalWeight / 100);
+        
+        let rating = "";
+        let advice = "";
+        if (totalScore >= 85) {
+            rating = "🟢 优秀";
+            advice = "具备爆红潜力，可启动引爆期策略";
+        } else if (totalScore >= 60) {
+            rating = "🟡 良好";
+            advice = "有短板，需针对性提升后再引爆";
+        } else if (totalScore >= 40) {
+            rating = "🟠 一般";
+            advice = "基础较弱，建议先夯实承接力";
+        } else {
+            rating = "🔴 待改善";
+            advice = "暂不适合追求爆红，先做基本功";
+        }
+        
+        const lines = [];
+        lines.push("═".repeat(50));
+        lines.push("🔥 工具三：热度指数卡分析结果");
+        lines.push("═".repeat(50));
+        lines.push("");
+        lines.push("📊 各维度得分：");
+        
+        for (const s of scores) {
+            const bar = "█".repeat(Math.floor(s.score / 10)) + "░".repeat(10 - Math.floor(s.score / 10));
+            lines.push(`   ${s.name}：${s.score.toFixed(0)}分 ${bar} 权重${s.weight}%`);
+            lines.push(`      ${s.desc}`);
+        }
+        
+        lines.push("");
+        lines.push("📈 综合得分：" + totalScore.toFixed(1) + "分");
+        lines.push("🏆 评级：" + rating);
+        lines.push("💡 建议：" + advice);
+        
+        // 添加雷达图描述
+        lines.push("");
+        lines.push("📊 得分排序：");
+        const sorted = [...scores].sort((a, b) => b.score - a.score);
+        for (const s of sorted) {
+            lines.push(`   ${s.name}：${s.score.toFixed(0)}分`);
+        }
+        
+        // 找出短板
+        const weakest = sorted[sorted.length - 1];
+        lines.push("");
+        lines.push(`⚠️ 最需改进维度：${weakest.name}（${weakest.score.toFixed(0)}分）`);
+        lines.push(`   建议：${weakest.desc} 方面需要重点提升`);
+        
+        return lines.join('\n');
+    }
+    
+    // ==================== 主分析函数 ====================
+    function runAnalysis() {
+        const resultDiv = document.getElementById('resultContent');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = progressBar.querySelector('.progress-fill');
+        
+        // 显示进度条
+        progressBar.style.display = 'block';
+        progressFill.style.width = '0%';
+        
+        setTimeout(() => {
+            progressFill.style.width = '50%';
+        }, 50);
+        
+        setTimeout(() => {
+            let result = "";
+            if (currentTool === "tool1" || currentTool === "tool2") {
+                const comments = getComments();
+                if (currentTool === "tool1") {
+                    result = runTool1(comments);
+                } else {
+                    result = runTool2(comments);
+                }
+            } else {
+                result = runTool3();
+            }
+            
+            resultDiv.textContent = result;
+            progressFill.style.width = '100%';
+            
+            setTimeout(() => {
+                progressBar.style.display = 'none';
+                progressFill.style.width = '0%';
+            }, 500);
+        }, 100);
+    }
+    
+    // ==================== 辅助函数 ====================
+    function loadCSV() {
+        const fileInput = document.getElementById('csvFile');
+        fileInput.click();
+        
+        fileInput.onchange = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const content = evt.target.result;
+                const lines = content.split('\n');
+                // 跳过第一行（表头）
+                let dataLines = lines.slice(1);
+                // 尝试找到评论文本列
+                let textColumnIndex = 0;
+                const header = lines[0].toLowerCase();
+                if (header.includes('评论') || header.includes('内容') || header.includes('text')) {
+                    const headers = lines[0].split(',');
+                    for (let i = 0; i < headers.length; i++) {
+                        if (headers[i].includes('评论') || headers[i].includes('内容') || headers[i].includes('text')) {
+                            textColumnIndex = i;
+                            break;
+                        }
+                    }
+                }
+                
+                const comments = [];
+                for (const line of dataLines) {
+                    const parts = line.split(',');
+                    if (parts.length > textColumnIndex) {
+                        const comment = parts[textColumnIndex].trim();
+                        if (comment) comments.push(comment);
+                    }
+                }
+                
+                const textarea = document.getElementById('commentInput');
+                textarea.value = comments.join('\n');
+                alert(`成功导入 ${comments.length} 条评论`);
+            };
+            reader.readAsText(file, 'UTF-8');
+        };
+    }
+    
+    function loadSample() {
+        const sampleComments = [
+            "淄博烧烤太好吃啦，服务态度也很好！",
+            "排队太久了，等了两个小时...",
+            "价格实惠，味道正宗，下次还来！",
+            "环境一般，但是烧烤味道确实不错",
+            "有点贵，性价比不高",
+            "服务热情，烤串很香，推荐！",
+            "人太多了，体验不太好",
+            "特意从外地来的，没有失望",
+            "网红店，打卡成功，味道不错",
+            "老板很热情，还送了饮料"
+        ];
+        const textarea = document.getElementById('commentInput');
+        textarea.value = sampleComments.join('\n');
+    }
+    
+    function clearText() {
+        const textarea = document.getElementById('commentInput');
+        textarea.value = "";
+    }
+    
+    function copyResult() {
+        const resultDiv = document.getElementById('resultContent');
+        const text = resultDiv.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            alert("结果已复制到剪贴板");
+        }).catch(() => {
+            alert("复制失败，请手动复制");
+        });
+    }
+    
+    function saveResult() {
+        const resultDiv = document.getElementById('resultContent');
+        const text = resultDiv.textContent;
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `淄博烧烤诊断结果_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+        alert("结果已保存");
+    }
+    
+    // ==================== 界面切换 ====================
+    function switchTool(tool) {
+        currentTool = tool;
+        
+        // 更新按钮样式
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            if (btn.dataset.tool === tool) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        
+        const commentArea = document.getElementById('commentInputArea');
+        const dimensionArea = document.getElementById('dimensionArea');
+        
+        if (tool === "tool3") {
+            commentArea.style.display = 'none';
+            dimensionArea.style.display = 'block';
+        } else {
+            commentArea.style.display = 'block';
+            dimensionArea.style.display = 'none';
+        }
+    }
+    
+    // ==================== 初始化维度评分UI ====================
+    function initDimensions() {
+        const container = document.getElementById('dimensionsList');
+        container.innerHTML = '';
+        
+        for (const dim of DIMENSIONS) {
+            const div = document.createElement('div');
+            div.className = 'dimension-item';
+            div.innerHTML = `
+                <div class="dimension-name">${dim.name}</div>
+                <div class="dimension-weight">权重 ${dim.weight}%</div>
+                <div class="dimension-desc">${dim.desc}</div>
+                <div class="dimension-score">
+                    <input type="number" id="score_${dim.name}" value="50" min="0" max="100" step="5">
+                </div>
+                <div class="score-bar">
+                    <div class="bar-bg">
+                        <div class="bar-fill" id="bar_${dim.name}" style="width: 50%"></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+            
+            // 绑定输入事件
+            const input = div.querySelector(`input`);
+            input.addEventListener('input', (e) => {
+                let val = parseFloat(e.target.value);
+                if (isNaN(val)) val = 50;
+                val = Math.max(0, Math.min(100, val));
+                const bar = document.getElementById(`bar_${dim.name}`);
+                if (bar) bar.style.width = `${val}%`;
+            });
+        }
+    }
+    
+    // ==================== 事件绑定 ====================
+    function bindEvents() {
+        // 工具切换
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTool(btn.dataset.tool));
+        });
+        
+        // 按钮事件
+        document.getElementById('runBtn').addEventListener('click', runAnalysis);
+        document.getElementById('importBtn').addEventListener('click', loadCSV);
+        document.getElementById('clearBtn').addEventListener('click', clearText);
+        document.getElementById('sampleBtn').addEventListener('click', loadSample);
+        document.getElementById('copyBtn').addEventListener('click', copyResult);
+        document.getElementById('saveBtn').addEventListener('click', saveResult);
+    }
+    
+    // ==================== 启动 ====================
+    initDimensions();
+    bindEvents();
+    loadSample();  // 加载示例数据
+</script>
+</body>
+</html>
