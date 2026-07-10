@@ -50,9 +50,10 @@
 - **部署平台**：GitHub Pages
 
 ## 项目结构
+```text
 web/
-├── index.html # 工具箱主页面
-├── README.md # 项目说明文档
+├── index.html          # 工具箱主页面
+└── README.md           # 项目说明文档
 
 ## 数据来源
 - B站公开评论（2023-2026年，共1万条）
