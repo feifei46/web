@@ -50,7 +50,7 @@
 - **部署平台**：GitHub Pages
 
 ## 项目结构
-web
+web/
 ├── index.html # 工具箱主页面
 ├── README.md # 项目说明文档
 
